@@ -1,6 +1,8 @@
 ## Overview
 
-![architecture-aws](https://github.com/user-attachments/assets/c892d7aa-790c-44a4-895d-976f8be990d2)
+![hybrid](https://github.com/user-attachments/assets/f448431a-1650-4d91-ac3c-f52445e05bc3)
+
+
 
 
 ### 
