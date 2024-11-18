@@ -60,25 +60,36 @@ The directory structure ensures a clear separation between global resources, env
     - Ensures compliance and protects against potential threats.
  
 
-| **Source Segment** | **Destination Segment** | **Action** | **Inspection Group** |
-| --- | --- | --- | --- |
-| Production | Hybrid | `send-via` | `inspection` |
-| Production | SharedServices | `send-via` | `inspection` |
-| Hybrid | SharedServices | `send-via` | `inspection` |
-| Staging | Hybrid | `send-via` | `inspection` |
-| Staging | SharedServices | `send-via` | `inspection` |
+### Updated Segment Traffic Table
 
+| **Source Segment**    | **Destination Segment**  | **Action**                   |
+|-----------------------|--------------------------|-----------------------------|
+| Production US         | Hybrid                   | Inspected (`send-via`)      |
+| Production US         | Shared Services          | Inspected (`send-via`)      |
+| Hybrid                | Shared Services          | Inspected (`send-via`)      |
+| Staging US            | Hybrid                   | Inspected (`send-via`)      |
+| Staging US            | Shared Services          | Inspected (`send-via`)      |
+| Production EU         | Production US            | No Traffic                  |
+| Staging EU            | Staging US               | No Traffic                  |
+| Production            | Internet                 | Inspected (`send-to`)       |
+| Staging               | Internet                 | Inspected (`send-to`)       |
+
+---
 
 
 ---
 
 #### 5. **Traffic Segmentation**
 
+ in the EU region.
+ 
 - **Segments**:
-    1. **Production Segment**: For live production workloads.
-    2. **Staging Segment**: For pre-production and testing environments.
-    3. **Shared Services Segment**: Contains shared infrastructure services used by all environments.
-    4. **Hybrid Segment**: For workloads that span on-premises and cloud.
+    1. **Production US Segment**: For live production workloads in the US region.
+    2. **Production EU Segment**: For live production workloads in the EU region.
+    3. **Staging US Segment**: For pre-production and testing environments in US region.
+    4. **Staging EU Segment**: For pre-production and testing environments in EU region. 
+    5. **Shared Services Segment**: Contains shared infrastructure services used by all environments.
+    6. **Hybrid Segment**: For workloads that span on-premises and cloud.
 - **Traffic Flows**:
     - Traffic is color-coded based on the segment (e.g., blue for Production, orange for Staging).
     - Traffic between segments follows defined routing policies, with **send-via** actions ensuring inspection and control.
@@ -127,53 +138,4 @@ This architecture employs a multi-account strategy to ensure secure and efficien
 - The Security account provides a single point of control for managing access across multiple environments.
 - Strong isolation between environments (`prod` and `stage`) prevents accidental or malicious actions from impacting production systems.
 
-## Directory Structure
 
-Here’s an overview of the directory and file structure:
-
-```
-.
-├── envcommon         # Common configurations shared across environments
-├── live              # Environment-specific configurations
-│   ├── global        # Global configurations (e.g., Cloud WAN, Accounts)
-│   └── production    # Production-specific configurations
-│       ├── us-east-1
-│       └── eu-central-1
-├── modules           # Reusable Terraform modules
-└── terragrunt.hcl    # Root Terragrunt configuration
-```
-
-### Key Folders
-
-1. **`envcommon`**  
-   Contains reusable HCL configurations for various components such as **Inspection VPCs**, **Transit Gateways**, and **VPN Connections**.
-
-2. **`live/global`**  
-   Manages global resources, including **Cloud WAN** and account-level settings.
-
-3. **`live/production`**  
-   Holds region-specific configurations for the production environment, organized by AWS region.
-
-4. **`modules`**  
-   Contains Terraform modules for individual infrastructure components like **VPC**, **Firewall**, and **Transit Gateway**.
-
----
-
-## Usage Instructions
-
-### 1. **Set Up Terragrunt**
-
-Ensure Terragrunt is installed. To deploy the infrastructure, navigate to the root or a specific environment directory and run:
-
-```bash
-terragrunt run-all apply
-```
-
-### 2. **Deploying Specific Components**
-
-To deploy a particular component (e.g., `Transit Gateway` in `us-east-1`), navigate to its directory:
-
-```bash
-cd live/production/us-east-1/prod/transit_gateway
-terragrunt apply
-```
