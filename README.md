@@ -2,8 +2,8 @@
 
 ## Overview ( Work In Progress )
 
-![Untitled Diagram drawio](https://github.com/user-attachments/assets/ae6dad1c-0800-49cd-9752-96bcda4fb9e4)
 
+<img width="1630" alt="hybrid-aws-min" src="https://github.com/user-attachments/assets/705948ea-40d1-4e7d-95be-8d41328aa23d">
 
 ### 
 
