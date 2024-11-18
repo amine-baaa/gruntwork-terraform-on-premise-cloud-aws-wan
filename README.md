@@ -97,3 +97,14 @@ To deploy a particular component (e.g., `Transit Gateway` in `us-east-1`), navig
 cd live/production/us-east-1/prod/transit_gateway
 terragrunt apply
 ```
+
+### AWS Account Structure for Environment Isolation
+
+This architecture employs a multi-account strategy to ensure secure and efficient management of different environments (`prod`, `stage`) through a centralized **Security Account**. 
+
+- Security account Acts as the central hub for identity and access management across all AWS accounts.
+- Each target account (`prod` and `stage`) has specific roles that grant permissions based on the tasks users need to perform.
+- Users (developers, administrators, operational staff) authenticate in the Security account.
+- Each user is assigned specific permissions within the Security account, which allow them to assume roles in the target accounts (`prod` or `stage`).
+- The Security account provides a single point of control for managing access across multiple environments.
+- Strong isolation between environments (`prod` and `stage`) prevents accidental or malicious actions from impacting production systems.
