@@ -39,20 +39,21 @@ Here’s an overview of the directory and file structure:
 
 ---
 
-## Key Components
+
+
+## Key Components 
 
 1. **Cloud WAN**: Acts as the backbone of the global network.  
-2. **VPC**: Deploys Virtual Private Clouds in specific AWS regions.  
-3. **Transit Gateway with AWS Network Manager Integration**: Centralized routing between multiple VPCs and on-premises networks, integrated with Cloud WAN for advanced management and monitoring.  
-   - **Transit Gateway Registration**: The Transit Gateway is registered with AWS Network Manager, integrating it into the Cloud WAN Global Network. This enables centralized management and monitoring of the Transit Gateway.  
+2. **VPC**  
+3. **Transit Gateway with AWS Network Manager Integration**: Centralized routing between multiple VPCs and on-premises networks, integrated with Cloud WAN.  
+   - **Transit Gateway Registration**: The Transit Gateway is registered with AWS Network Manager, integrating it into the Cloud WAN Global Network.  
    - **Peering with Cloud WAN Core Network**: A peering connection is established between the Transit Gateway and Cloud WAN Core Network. Tags, such as `Segment = "hybrid"`, are applied to specify the network segment for hybrid connectivity, including on-premises networks.  
-   - **Policy Table and Association**: A Transit Gateway Policy Table is created to define routing policies. The policy table is associated with the peering attachment, enabling advanced traffic control between Cloud WAN and Transit Gateway.  
+   - **Policy Table and Association**: A Transit Gateway Policy Table is created to define routing policies. The policy table is associated with the peering attachment.  
 
 4. **DX Gateway**: Enables high-speed, direct connections from on-premises to AWS.  
 5. **Inspection VPC**: Inspects and secures traffic between regions and to/from the internet.  
 6. **Firewall**: Enforces security rules for traffic within the Inspection VPC.  
-7. **VPN Connection**: Establishes secure tunnels between on-premises networks and AWS.  
-8. **Customer Gateway**: Represents the on-premises device endpoint for a VPN connection.
+7. **VPN Connection**: Establishes secure tunnels between on-premises networks and AWS.
 ---
 
 ## Component Interactions
