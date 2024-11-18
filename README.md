@@ -3,7 +3,12 @@
 ![architecture-aws](https://github.com/user-attachments/assets/c892d7aa-790c-44a4-895d-976f8be990d2)
 
 
-This project utilizes **Terraform** with **Terragrunt** to manage and deploy a multi-region network infrastructure. The architecture is modular, enabling easy reuse and integration of components. The key infrastructure elements include **Cloud WAN**, **VPCs**, **Transit Gateways**, **VPN Connections**, **DX Gateways**, **Inspection VPCs**, and **Firewalls**.
+### 
+
+This architecture represents a multi-region AWS Cloud WAN setup designed to manage and interconnect multiple environments (Production, Staging, Shared Services, and Hybrid). It uses AWS Cloud WAN as the backbone for global connectivity, enabling secure, scalable, and highly available communication between different VPCs, regions, and on-premises data centers.
+
+The design incorporates inspection capabilities, centralized traffic management, and hybrid connectivity through AWS Direct Connect and VPN for seamless integration of on-premises and cloud workloads. Each element is modular, following best practices to ensure high performance, cost efficiency, and security.
+
 
 The directory structure ensures a clear separation between global resources, environment-specific configurations, and reusable modules.
 
