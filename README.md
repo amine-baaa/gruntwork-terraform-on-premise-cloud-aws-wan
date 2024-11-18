@@ -58,6 +58,17 @@ The directory structure ensures a clear separation between global resources, env
 - **Functionality**:
     - All traffic is routed through inspection pods where it is analyzed and filtered based on security policies.
     - Ensures compliance and protects against potential threats.
+ 
+
+| **Source Segment** | **Destination Segment** | **Action** | **Inspection Group** |
+| --- | --- | --- | --- |
+| Production | Hybrid | `send-via` | `inspection` |
+| Production | SharedServices | `send-via` | `inspection` |
+| Hybrid | SharedServices | `send-via` | `inspection` |
+| Staging | Hybrid | `send-via` | `inspection` |
+| Staging | SharedServices | `send-via` | `inspection` |
+
+
 
 ---
 
@@ -104,15 +115,6 @@ The directory structure ensures a clear separation between global resources, env
 5. **DX Gateways** and **VPN Connections** establish hybrid connectivity, interacting with **Transit Gateways** for routing.
 
 ---
-
-| **Source Segment** | **Destination Segment** | **Action** | **Inspection Group** |
-| --- | --- | --- | --- |
-| Production | Hybrid | `send-via` | `inspection` |
-| Production | SharedServices | `send-via` | `inspection` |
-| Hybrid | SharedServices | `send-via` | `inspection` |
-| Staging | Hybrid | `send-via` | `inspection` |
-| Staging | SharedServices | `send-via` | `inspection` |
-
 
 ### AWS Account Structure for Environment Isolation
 
