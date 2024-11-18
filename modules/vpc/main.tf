@@ -101,12 +101,24 @@ resource "aws_route_table" "private_route_table" {
     Name = "${var.vpc_name}-private-rt-${count.index + 1}"
   }
 }
+data "aws_networkmanager_core_network" "core_network" {
+  core_network_id = var.core_network_id
+}
+
 resource "aws_route" "private_route" {
   count = length(aws_subnet.private_subnet) > 0 && length(aws_nat_gateway.nat) > 0 ? length(aws_subnet.private_subnet) : 0
   route_table_id         = aws_route_table.private_route_table[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.nat[count.index % length(aws_nat_gateway.nat)].id
 }
+
+resource "aws_route" "private_core_network_route" {
+  count = length(aws_subnet.private_subnet)
+  route_table_id         = aws_route_table.private_route_table[count.index].id
+  destination_cidr_block = "0.0.0.0/0" 
+  core_network_arn       = data.aws_networkmanager_core_network.core_network.arn
+}
+
 resource "aws_route_table_association" "private_subnet_association" {
   count          = length(aws_subnet.private_subnet)
   subnet_id      = aws_subnet.private_subnet[count.index].id
