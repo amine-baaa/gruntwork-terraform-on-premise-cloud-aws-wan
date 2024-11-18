@@ -7,7 +7,7 @@ terraform {
 }
 
 include "envcommon" {
-  path = "${dirname(find_in_parent_folders())}/envcommon/egress_vpc.hcl"
+  path = "${dirname(find_in_parent_folders())}/envcommon/inspection_vpc.hcl"
   expose = true
 }
 
