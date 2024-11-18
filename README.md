@@ -65,6 +65,14 @@ Here’s an overview of the directory and file structure:
 
 ---
 
+| **Source Segment** | **Destination Segment** | **Action** | **Inspection Group** |
+| --- | --- | --- | --- |
+| Production | Hybrid | `send-via` | `inspection` |
+| Production | SharedServices | `send-via` | `inspection` |
+| Hybrid | SharedServices | `send-via` | `inspection` |
+| Staging | Hybrid | `send-via` | `inspection` |
+| Staging | SharedServices | `send-via` | `inspection` |
+
 ## Usage Instructions
 
 ### 1. **Set Up Terragrunt**
