@@ -1,8 +1,9 @@
+
 resource "aws_vpc" "vpc" {
   cidr_block           = var.vpc_cidr_block
   enable_dns_support   = true
   enable_dns_hostnames = true
- tags = {
+  tags = {
     Terraform   = "true"
     Environment = var.environment
   }
@@ -18,7 +19,6 @@ resource "aws_subnet" "public_subnet" {
     Name = "${var.vpc_name}-public-${count.index + 1}"
   }
 }
-
 
 resource "aws_subnet" "private_subnet" {
   count                   = length(var.private_subnets)
@@ -41,6 +41,7 @@ resource "aws_subnet" "cwan_subnet" {
     Name = "${var.vpc_name}-cwan-${count.index + 1}"
   }
 }
+
 resource "aws_subnet" "fw_subnet" {
   count                   = length(var.fw_subnets)
   vpc_id                  = aws_vpc.vpc.id
@@ -52,6 +53,7 @@ resource "aws_subnet" "fw_subnet" {
   }
 }
 
+# Internet Gateway
 resource "aws_internet_gateway" "igw" {
   count = length(var.public_subnets) > 0 ? 1 : 0
   vpc_id = aws_vpc.vpc.id
@@ -60,32 +62,100 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-
 resource "aws_route_table" "public_route_table" {
   count = length(var.public_subnets) > 0 ? 1 : 0
   vpc_id = aws_vpc.vpc.id
   tags = {
     Name = "${var.vpc_name}-public-rt"
   }
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id             = aws_internet_gateway.igw[0].id
+  }
 }
 
+resource "aws_route_table" "private_route_table" {
+  count = length(aws_subnet.private_subnet)
+  vpc_id = aws_vpc.vpc.id
+  tags = {
+    Name = "${var.vpc_name}-private-rt-${count.index + 1}"
+  }
 
-resource "aws_route" "public_route" {
-  count = length(var.public_subnets) > 0 ? 1 : 0
-  route_table_id         = aws_route_table.public_route_table[0].id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.igw[0].id
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id         = aws_nat_gateway.nat[count.index % length(aws_nat_gateway.nat)].id
+  }
+
+  route {
+    cidr_block = "10.0.0.0/8"
+    core_network_arn       = data.aws_networkmanager_core_network.core_network.arn
+  }
 }
 
+resource "aws_route_table" "cwan_route_table" {
+  count = length(aws_subnet.cwan_subnet)
+  vpc_id = aws_vpc.vpc.id
+  tags = {
+    Name = "${var.vpc_name}-cwan-rt-${count.index + 1}"
+  }
+
+  route {
+    cidr_block = "10.0.0.0/8"
+    core_network_arn       = data.aws_networkmanager_core_network.core_network.arn
+  }
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    network_interface_id   = var.firewall_endpoint_id
+  }
+}
+resource "aws_route_table" "fw_route_table" {
+  count = length(aws_subnet.fw_subnet)
+  vpc_id = aws_vpc.vpc.id
+  tags = {
+    Name = "${var.vpc_name}-fw-rt-${count.index + 1}"
+  }
+
+  route {
+    cidr_block = "10.0.0.0/8"
+    core_network_arn       = data.aws_networkmanager_core_network.core_network.arn
+  }
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    network_interface_id   = var.firewall_endpoint_id
+  }
+}
 
 resource "aws_route_table_association" "public_subnet_association" {
   count          = length(aws_subnet.public_subnet)
   subnet_id      = aws_subnet.public_subnet[count.index].id
   route_table_id = aws_route_table.public_route_table[0].id
 }
+
+resource "aws_route_table_association" "private_subnet_association" {
+  count          = length(aws_subnet.private_subnet)
+  subnet_id      = aws_subnet.private_subnet[count.index].id
+  route_table_id = aws_route_table.private_route_table[count.index].id
+}
+
+resource "aws_route_table_association" "cwan_subnet_association" {
+  count          = length(aws_subnet.cwan_subnet)
+  subnet_id      = aws_subnet.cwan_subnet[count.index].id
+  route_table_id = aws_route_table.cwan_route_table[count.index].id
+}
+
+resource "aws_route_table_association" "fw_subnet_association" {
+  count          = length(aws_subnet.fw_subnet)
+  subnet_id      = aws_subnet.fw_subnet[count.index].id
+  route_table_id = aws_route_table.fw_route_table[count.index].id
+}
+
 resource "aws_eip" "nat_eip" {
   count = length(aws_subnet.public_subnet)
 }
+
 resource "aws_nat_gateway" "nat" {
   count        = length(aws_subnet.public_subnet)
   allocation_id = aws_eip.nat_eip[count.index].id
@@ -93,33 +163,6 @@ resource "aws_nat_gateway" "nat" {
   tags = {
     Name = "${var.vpc_name}-nat-${count.index + 1}"
   }
-}
-resource "aws_route_table" "private_route_table" {
-  count = length(aws_subnet.private_subnet)
-  vpc_id = aws_vpc.vpc.id
-  tags = {
-    Name = "${var.vpc_name}-private-rt-${count.index + 1}"
-  }
-}
-
-resource "aws_route" "private_route" {
-  count = length(aws_subnet.private_subnet) > 0 && length(aws_nat_gateway.nat) > 0 ? length(aws_subnet.private_subnet) : 0
-  route_table_id         = aws_route_table.private_route_table[count.index].id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.nat[count.index % length(aws_nat_gateway.nat)].id
-}
-
-resource "aws_route" "private_core_network_route" {
-  count = length(aws_subnet.private_subnet)
-  route_table_id         = aws_route_table.private_route_table[count.index].id
-  destination_cidr_block = "0.0.0.0/0" 
-  core_network_arn       = data.aws_networkmanager_core_network.core_network.arn
-}
-
-resource "aws_route_table_association" "private_subnet_association" {
-  count          = length(aws_subnet.private_subnet)
-  subnet_id      = aws_subnet.private_subnet[count.index].id
-  route_table_id = aws_route_table.private_route_table[count.index].id
 }
 
 resource "aws_networkmanager_vpc_attachment" "nm_vpc_attachment" {
@@ -129,9 +172,8 @@ resource "aws_networkmanager_vpc_attachment" "nm_vpc_attachment" {
   options {
     appliance_mode_support = false
     ipv6_support           = false
-
   }
   tags = {
-    Segment = length(aws_subnet.public_subnet)> 0 ? "inspection" : var.environment
+    Segment = length(aws_subnet.public_subnet) > 0 ? "inspection" : var.environment
   }
 }

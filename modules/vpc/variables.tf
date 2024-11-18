@@ -1,5 +1,3 @@
-
-
 variable "vpc_name" {
   description = "Name of the VPC"
   type        = string
@@ -42,17 +40,24 @@ variable "fw_subnets" {
 variable "environment" {
   description = "Environment name"
   type        = string
-
 }
 
 variable "core_network_id" {
   description = "The ID of the core network to attach the VPC"
   type        = string
-
 }
 
 variable "core_network_arn" {
   description = "The ARN of the core network to attach the VPC"
   type        = string
+}
 
+variable "firewall_endpoint_id" {
+  description = "The ID of the Firewall Endpoint for routing 0.0.0.0/0"
+  type        = string
+}
+
+variable "region" {
+  description = "The AWS region where the resources will be created"
+  type        = string
 }
