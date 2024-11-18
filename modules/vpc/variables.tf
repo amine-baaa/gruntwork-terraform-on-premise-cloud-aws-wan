@@ -52,12 +52,8 @@ variable "core_network_arn" {
   type        = string
 }
 
-variable "firewall_endpoint_id" {
-  description = "The ID of the Firewall Endpoint for routing 0.0.0.0/0"
-  type        = string
-}
+# variable "firewall_endpoint_id" {
+#   description = "The ID of the Firewall Endpoint for routing 0.0.0.0/0"
+#   type        = string
+# }
 
-variable "region" {
-  description = "The AWS region where the resources will be created"
-  type        = string
-}

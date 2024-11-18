@@ -89,7 +89,7 @@ resource "aws_route_table" "private_route_table" {
 
   route {
     cidr_block = "10.0.0.0/8"
-    core_network_arn       = data.aws_networkmanager_core_network.core_network.arn
+    core_network_arn       = var.core_network_arn
   }
 }
 
@@ -102,13 +102,13 @@ resource "aws_route_table" "cwan_route_table" {
 
   route {
     cidr_block = "10.0.0.0/8"
-    core_network_arn       = data.aws_networkmanager_core_network.core_network.arn
+    core_network_arn       = var.core_network_arn
   }
 
-  route {
-    cidr_block = "0.0.0.0/0"
-    network_interface_id   = var.firewall_endpoint_id
-  }
+  # route {
+  #   cidr_block = "0.0.0.0/0"
+  #   network_interface_id   = var.firewall_endpoint_id
+  # }
 }
 resource "aws_route_table" "fw_route_table" {
   count = length(aws_subnet.fw_subnet)
@@ -119,13 +119,13 @@ resource "aws_route_table" "fw_route_table" {
 
   route {
     cidr_block = "10.0.0.0/8"
-    core_network_arn       = data.aws_networkmanager_core_network.core_network.arn
+    core_network_arn       = var.core_network_arn
   }
 
-  route {
-    cidr_block = "0.0.0.0/0"
-    network_interface_id   = var.firewall_endpoint_id
-  }
+  # route {
+  #   cidr_block = "0.0.0.0/0"
+  #   network_interface_id   = var.firewall_endpoint_id
+  # }
 }
 
 resource "aws_route_table_association" "public_subnet_association" {
