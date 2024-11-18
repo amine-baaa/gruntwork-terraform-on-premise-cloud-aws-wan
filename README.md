@@ -1,6 +1,7 @@
 ## Overview
 
-![architecture-aws](https://github.com/user-attachments/assets/58db37e2-9d6e-49d1-b7c1-75d925da78f6)
+![architecture-aws](https://github.com/user-attachments/assets/c892d7aa-790c-44a4-895d-976f8be990d2)
+
 
 This project utilizes **Terraform** with **Terragrunt** to manage and deploy a multi-region network infrastructure. The architecture is modular, enabling easy reuse and integration of components. The key infrastructure elements include **Cloud WAN**, **VPCs**, **Transit Gateways**, **VPN Connections**, **DX Gateways**, **Inspection VPCs**, and **Firewalls**.
 
