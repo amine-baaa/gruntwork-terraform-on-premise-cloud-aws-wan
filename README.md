@@ -19,10 +19,9 @@ The directory structure ensures a clear separation between global resources, env
 
 #### 1. **AWS Cloud WAN**
 
-- **Role**:
-    - Acts as a global networking layer to interconnect VPCs, regions, and on-premises data centers.
-- **Purpose**:
-    - Facilitates simplified and scalable network operations across multiple AWS regions and beyond.
+
+ - Acts as a global networking layer to interconnect VPCs, regions, and on-premises data centers.
+ - Facilitates simplified and scalable network operations across multiple AWS regions and beyond.
 
 ---
 
@@ -53,11 +52,9 @@ The directory structure ensures a clear separation between global resources, env
 
 #### 4. **Network Function Group (Inspection)**
 
-- **Role**:
-    - A centralized security layer for inspecting traffic between segments (Production, Staging, Shared Services, etc.).
-- **Functionality**:
-    - All traffic is routed through inspection pods where it is analyzed and filtered based on security policies.
-    - Ensures compliance and protects against potential threats.
+ - A centralized security layer for inspecting traffic between segments (Production, Staging, Shared Services, etc.).
+ - All traffic is routed through inspection pods where it is analyzed and filtered based on security policies.
+ - Ensures compliance and protects against potential threats.
  
 
 ### Updated Segment Traffic Table
@@ -73,6 +70,9 @@ The directory structure ensures a clear separation between global resources, env
 | Staging EU            | Staging US               | No Traffic                  |
 | Production            | Internet                 | Inspected (`send-to`)       |
 | Staging               | Internet                 | Inspected (`send-to`)       |
+| Internet              | Production / Staging                 |  Not implemented       |
+
+
 
 ---
 
@@ -80,16 +80,14 @@ The directory structure ensures a clear separation between global resources, env
 ---
 
 #### 5. **Traffic Segmentation**
-
- in the EU region.
  
 - **Segments**:
-    1. **Production US Segment**: For live production workloads in the US region.
-    2. **Production EU Segment**: For live production workloads in the EU region.
-    3. **Staging US Segment**: For pre-production and testing environments in US region.
-    4. **Staging EU Segment**: For pre-production and testing environments in EU region. 
-    5. **Shared Services Segment**: Contains shared infrastructure services used by all environments.
-    6. **Hybrid Segment**: For workloads that span on-premises and cloud.
+    1. Production US Segment: For live production workloads in the US region.
+    2. Production EU Segment: For live production workloads in the EU region.
+    3. Staging US Segment: For pre-production and testing environments in US region.
+    4. Staging EU Segment: For pre-production and testing environments in EU region. 
+    5. Shared Services Segment: Contains shared infrastructure services used by all environments.
+    6. Hybrid Segment: For workloads that span on-premises and cloud.
 - **Traffic Flows**:
     - Traffic is color-coded based on the segment (e.g., blue for Production, orange for Staging).
     - Traffic between segments follows defined routing policies, with **send-via** actions ensuring inspection and control.
@@ -108,9 +106,8 @@ The directory structure ensures a clear separation between global resources, env
 
 #### 8. **Transit Gateways**
 
-- **Role**:
-    - Act as a regional interconnect between VPCs.
-    - Provide flexible and scalable routing between the Direct Connect Gateways, and on-premises networks.
+- Act as a regional interconnect between VPCs.
+- Provide flexible and scalable routing between the Direct Connect Gateways, and on-premises networks.
 - **AWS Network Manager Integratio**
    - Transit Gateway Registration: The Transit Gateway is registered with AWS Network Manager, integrating it into the Cloud WAN Global Network.
    - Peering with Cloud WAN Core Network: A peering connection is established between the Transit Gateway and Cloud WAN Core Network. Tags, such as Segment = "hybrid", are applied to specify the network segment for hybrid connectivity, including on-premises networks.
@@ -119,7 +116,7 @@ The directory structure ensures a clear separation between global resources, env
 
 ## Component Interactions
 
-1. **Cloud WAN** serves as the central network fabric, connecting various **VPCs**, **Inspection VPCs**, and **Transit Gateways**.
+1. **Cloud WAN** serves as the central network, connecting various **VPCs**, **Inspection VPCs**, and **Transit Gateways**.
 2. **Transit Gateway** integrates with **AWS Network Manager** for centralized management and establishes peering with the **Cloud WAN Core Network**.
 3. **Policy Table** within **Transit Gateway** allows advanced traffic control and routing policies between AWS and on-premises.
 4. **Inspection VPCs** inspect and secure traffic flows, with additional security enforced by **Firewalls**.
@@ -127,6 +124,35 @@ The directory structure ensures a clear separation between global resources, env
 
 ---
 
+## Security 
+
+This solution supports companies requiring stringent security compliance by implementing comprehensive traffic inspection and control:
+
+- **North-South Traffic Inspection**:
+  - **On-Premises Connectivity (Ingress and Egress)**: All incoming (ingress) and outgoing (egress) traffic between on-premises data centers and AWS passes through centralized **Inspection VPCs**. This ensures that data moving between on-premises and cloud environments is thoroughly inspected for security threats and compliance adherence.
+  - **Internet Connectivity (Egress Only)**: VPCs within AWS have egress-only access to the internet, primarily for purposes like downloading updates or patches. This outbound internet traffic is routed through the **Inspection VPCs** for security checks. **Ingress from the internet is not implemented in this case**.
+
+- **East-West Traffic Inspection**:
+  - **Inter-VPC Communication**: Traffic between VPCs within AWS (e.g., between Production and Shared Services) is routed through the **Inspection VPCs** via **send-via** policies, allowing deep packet inspection and enforcement of security policies between different environments.
+
+- **Traffic Segmentation and Isolation**:
+  - **AWS Cloud WAN Segments**: The use of segments in AWS Cloud WAN, with defined routing policies, isolates environments (Production, Staging, Hybrid). This prevents unauthorized lateral movement and data leakage between segments.
+
+- **Centralized Security Enforcement**:
+  - **Inspection VPCs**: Serve as chokepoints for all traffic flows—north-south (on-premises ingress and egress, internet egress) and east-west—enabling consistent application of security policies across the network.
+  - **Firewalls and Security Appliances**: Deployed within Inspection VPCs to inspect, log, and control traffic based on compliance requirements.
+
+- **Secure Hybrid Connectivity**:
+  - **AWS Direct Connect and VPN**: Provide secure, encrypted pathways for on-premises traffic, maintaining data integrity and confidentiality between on-premises networks and AWS.
+
+- **Multi-Account Structure with Centralized Security**:
+  - **Security Account**: Acts as a central point for identity and access management, ensuring consistent security policies and simplifying compliance auditing across all environments.
+  - **Environment Isolation**: Strong separation between `prod` and `stage` accounts prevents accidental or malicious actions from impacting production systems.
+
+By thoroughly inspecting and controlling both north-south (on-premises ingress and egress, internet egress) and east-west traffic the architecture enforces strict security measures. This comprehensive approach ensure all data flows are secure, monitored, and adhere to best practices.
+
+ --- 
+ 
 ### AWS Account Structure for Environment Isolation
 
 This architecture employs a multi-account strategy to ensure secure and efficient management of different environments (`prod`, `stage`) through a centralized **Security Account**. 
@@ -137,5 +163,18 @@ This architecture employs a multi-account strategy to ensure secure and efficien
 - Each user is assigned specific permissions within the Security account, which allow them to assume roles in the target accounts (`prod` or `stage`).
 - The Security account provides a single point of control for managing access across multiple environments.
 - Strong isolation between environments (`prod` and `stage`) prevents accidental or malicious actions from impacting production systems.
+
+ --- 
+### GDPR 
+
+This architecture ensures compliance with GDPR Chapter V by keeping personal data stored and processed entirely within the EU region and by performing traffic inspection within each region. Specifically:
+
+- **Complete Isolation**: The **Production EU Segment** is entirely separate from the **Production US Segment**, with no network connectivity between them. Since these segments are fully isolated, data cannot flow from the EU to the US.
+
+- **Regional Inspection**: Each region implements its own **Inspection VPCs**, ensuring that all traffic inspection and security controls occur locally. This means that EU data is inspected and managed solely within the EU region, without involving any resources or networks from other regions.
+
+- **Data Residency Assurance**: By segregating environments at the network level and performing regional inspections, the architecture guarantees that all EU data is stored, processed (compute), and secured within the EU region, meeting GDPR's data residency requirements.
+
+This design allows companies to store, process, and inspect personal data exclusively within the EU, preventing any unintended transfers outside the region and helping them comply with GDPR Chapter V regulations on international data movement.
 
 
