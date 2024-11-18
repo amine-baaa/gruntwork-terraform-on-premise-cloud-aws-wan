@@ -50,3 +50,9 @@ variable "core_network_id" {
   type        = string
 
 }
+
+variable "core_network_arn" {
+  description = "The ARN of the core network to attach the VPC"
+  type        = string
+
+}

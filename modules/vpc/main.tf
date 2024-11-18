@@ -101,9 +101,6 @@ resource "aws_route_table" "private_route_table" {
     Name = "${var.vpc_name}-private-rt-${count.index + 1}"
   }
 }
-data "aws_networkmanager_core_network" "core_network" {
-  core_network_id = var.core_network_id
-}
 
 resource "aws_route" "private_route" {
   count = length(aws_subnet.private_subnet) > 0 && length(aws_nat_gateway.nat) > 0 ? length(aws_subnet.private_subnet) : 0

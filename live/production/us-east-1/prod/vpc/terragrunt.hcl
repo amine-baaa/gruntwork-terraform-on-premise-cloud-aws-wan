@@ -18,4 +18,5 @@ dependency "cloud_wan" {
 inputs = {
   availability_zones = ["us-east-1a", "us-east-1b"]
   core_network_id    = dependency.cloud_wan.outputs.core_network_id
+  core_network_arn   = dependency.cloud_wan.outputs.core_network_arn
 }
