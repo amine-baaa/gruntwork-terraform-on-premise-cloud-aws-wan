@@ -72,16 +72,16 @@ data "aws_networkmanager_core_network_policy_document" "core_network_policy" {
     }
   }
 
-  segment_actions {
-    action  = "send-via"
-    segment = "production"
-    when_sent_to {
-      segments = ["hybrid"]
-    }
-    via {
-      network_function_groups = ["inspection"]
-    }
-  }
+  # segment_actions {
+  #   action  = "send-via"
+  #   segment = "production"
+  #   when_sent_to {
+  #     segments = ["hybrid"]
+  #   }
+  #   via {
+  #     network_function_groups = ["inspection"]
+  #   }
+  # }
 
   # segment_actions {
   #   action  = "send-via"
