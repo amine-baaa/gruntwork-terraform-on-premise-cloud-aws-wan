@@ -49,7 +49,7 @@ Here’s an overview of the directory and file structure:
 ## Key Components 
 
 1. **Cloud WAN**: Acts as the backbone of the global network.  
-2. **VPC**  
+2. **Application VPC**  
 3. **Transit Gateway with AWS Network Manager Integration**: Centralized routing between multiple VPCs and on-premises networks, integrated with Cloud WAN.  
    - **Transit Gateway Registration**: The Transit Gateway is registered with AWS Network Manager, integrating it into the Cloud WAN Global Network.  
    - **Peering with Cloud WAN Core Network**: A peering connection is established between the Transit Gateway and Cloud WAN Core Network. Tags, such as `Segment = "hybrid"`, are applied to specify the network segment for hybrid connectivity, including on-premises networks.  
