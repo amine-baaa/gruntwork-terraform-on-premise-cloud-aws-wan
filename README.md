@@ -1,5 +1,3 @@
-# Project Readme: Terraform Infrastructure with Terragrunt
-
 ## Overview
 
 This project utilizes **Terraform** with **Terragrunt** to manage and deploy a multi-region network infrastructure. The architecture is modular, enabling easy reuse and integration of components. The key infrastructure elements include **Cloud WAN**, **VPCs**, **Transit Gateways**, **VPN Connections**, **DX Gateways**, **Inspection VPCs**, and **Firewalls**.
