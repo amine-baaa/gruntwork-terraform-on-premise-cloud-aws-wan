@@ -84,13 +84,13 @@ resource "aws_route_table" "private_route_table" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    nat_gateway_id         = aws_nat_gateway.nat[count.index % length(aws_nat_gateway.nat)].id
+    nat_gateway_id         = length(var.public_subnets) > 0 ? aws_nat_gateway.nat[count.index % length(aws_nat_gateway.nat)].id : null
   }
 
-  route {
-    cidr_block = "10.0.0.0/8"
-    core_network_arn       = var.core_network_arn
-  }
+  # route {
+  #   cidr_block = "10.0.0.0/8"
+  #   core_network_arn       = var.core_network_arn
+  # }
 }
 
 resource "aws_route_table" "cwan_route_table" {

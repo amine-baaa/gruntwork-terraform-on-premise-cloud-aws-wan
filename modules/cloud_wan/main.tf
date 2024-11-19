@@ -140,3 +140,17 @@ resource "aws_networkmanager_core_network_policy_attachment" "policy_attachment"
   core_network_id = aws_networkmanager_core_network.core_network.id
   policy_document = data.aws_networkmanager_core_network_policy_document.core_network_policy.json
 }
+
+output "core_network_arn" {
+  value = aws_networkmanager_core_network.core_network.arn
+}
+
+
+output "global_network_id" {
+   value = aws_networkmanager_global_network.global_network.id
+}
+
+output "core_network_id" {
+  value = aws_networkmanager_core_network.core_network.id
+}
+

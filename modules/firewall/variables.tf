@@ -12,7 +12,6 @@ variable "subnet_ids" {
 variable "firewall_name" {
   description = "Name of the Network Firewall"
   type        = string
-  default     = "example-firewall"
 }
 
 variable "tags" {
